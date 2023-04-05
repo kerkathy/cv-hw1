@@ -3,7 +3,6 @@
 # import the necessary packages
 from torchvision.models import detection
 from torch.utils.data import Dataset, DataLoader
-import torchvision.transforms as trns
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 import numpy as np
@@ -35,50 +34,18 @@ ap.add_argument("-c", "--confidence", type=float, default=0.5,
 ap.add_argument("-b", "--batch_size", type=int, default=8)
 args = vars(ap.parse_args())
 
-# load the class labels
-# from the "categories" section in the json file called `.annotations.coco.json` in the directory assigned by `--dataset`
-
-
-# TODO: collate_fn? transform?
-# 使用 trns.ToTensor() 將影像大小為 (H x W x C) ，值的範圍介於 [0, 255] 的 PIL Image 或是 numpy.ndarray
-# 轉換至影像大小為 (C x H x W) ，值的範圍介於 [0.0, 1.0] 的 torch.FloatTensor
 data_paths = {split: args["data_dir"] / split for split in SPLITS}
 
 datasets: dict[str, MarineDataset] = {
-    split: MarineDataset(path, transforms=trns.ToTensor())
+    split: MarineDataset(path)
     for split, path in data_paths.items()
 }
 print(f"Loaded {len(datasets[TRAIN])} training images")
 print(f"Loaded {len(datasets[DEV])} validation images")
 
-# Group data with the same height and width together, so that we can batch them together
-
-# 分組並按尺寸排序
-image_sizes = {}
-for img_size in datasets[TRAIN].image_sizes:
-    id, size = img_size
-    if size not in image_sizes:
-        image_sizes[size] = []
-    image_sizes[size].append(id)
-sorted_indices = []
-for size in image_sizes:
-    sorted_indices.extend(image_sizes[size])
-for size in image_sizes:
-    print(f"Size: {size}, first img: {image_sizes[size][0]}, last img: {image_sizes[size][-1]}")
-    print(f"Size: {size}, {len(image_sizes[size])} images")
-# print(image_sizes)  
-# print(sorted_indices)
-sys.exit(0)
-
-
-# 按排序後的索引創建數據加載器
-batch_size = 16
-# data_loader = DataLoader(image_folder, batch_size=batch_size, sampler=torch.utils.data.sampler.SubsetRandomSampler(sorted_indices))
-
-
 # create DataLoader for train / dev datasets
-train_dataloader = DataLoader(datasets[TRAIN], shuffle=True, batch_size=args["batch_size"])
-dev_dataloader = DataLoader(datasets[DEV], shuffle=False, batch_size=args["batch_size"])
+train_dataloader = DataLoader(datasets[TRAIN], shuffle=True, batch_size=args["batch_size"], collate_fn=datasets[TRAIN].collate_fn)
+dev_dataloader = DataLoader(datasets[DEV], shuffle=False, batch_size=args["batch_size"], collate_fn=datasets[DEV].collate_fn)
 
 # set the device we will be using to run the model
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -89,25 +56,32 @@ if args["stage"] == "debug":
     # For Training
     images, targets = next(iter(train_dataloader))
     print(f"Reading {len(images)} data")
+
+    # # Recover original image from normalized tensor
+    # # Draw one image with bounding boxes and save it to disk
+    
+    # # Draw image from tensor of size (3, 1024, 768) and save it to disk
+
+    # img = images[0] * 255
+    # print("value of img[0]: ", img)
+    # print("size of img[0]: ", img.shape)
+    # img = img.permute(1, 2, 0).numpy()
+    # # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    # for box in targets[0]["boxes"]:
+    #     cv2.rectangle(img, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 255, 0), 2)
+    # cv2.imwrite("debug.jpg", img)
+    
+
     images = list(image for image in images)
-    try:
-        targets = [{k: v for k, v in t.items()} for t in targets]
-        #TODO: fix bug here
-    except AttributeError:
-        print("len: ", len(targets))
-        print("type: ", type(targets))
-        for i, t in enumerate(targets):
-            print(f"[{i}]")
-            print(type(t))
-            print(t)
-        sys.exit(0)
+    targets = [{k: v for k, v in t.items()} for t in targets]
+    print("images:", images)
+    print("targets:", targets)
+
     output = model(images, targets)   # Returns losses and detections
     # For inference
     model.eval()
     x = [torch.rand(3, 300, 400), torch.rand(3, 500, 400)]
     predictions = model(x)           # Returns predictions
-    print("images:", images)
-    print("targets:", targets)
     print("model:", model)
     sys.exit(0)
 
@@ -142,5 +116,33 @@ https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 https://www.twblogs.net/a/5d720e21bd9eee5327ff7374
 https://pyimagesearch.com/2021/08/02/pytorch-object-detection-with-pre-trained-networks/
 https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection
+
+"""
+
+
+"""
+Archive:
+
+# Group data with the same height and width together, so that we can batch them together
+
+# 分組並按尺寸排序
+image_sizes = {}
+for img_size in datasets[TRAIN].image_sizes:
+    id, size = img_size
+    if size not in image_sizes:
+        image_sizes[size] = []
+    image_sizes[size].append(id)
+sorted_indices = []
+for size in image_sizes:
+    sorted_indices.extend(image_sizes[size])
+for size in image_sizes:
+    print(f"Size: {size}, first img: {image_sizes[size][0]}, last img: {image_sizes[size][-1]}")
+    print(f"Size: {size}, {len(image_sizes[size])} images")
+# print(image_sizes)  
+# print(sorted_indices)
+
+# 按排序後的索引創建數據加載器
+batch_size = 16
+# data_loader = DataLoader(image_folder, batch_size=batch_size, sampler=torch.utils.data.sampler.SubsetRandomSampler(sorted_indices))
 
 """
