@@ -1,7 +1,7 @@
 import torch
 from PIL import Image
 import json
-from utils import resize_bbox, transform
+from utils import resize_bbox, transform, xywh2xyxy
 import cv2
 
 class MarineDataset(torch.utils.data.Dataset):
@@ -58,11 +58,6 @@ class MarineDataset(torch.utils.data.Dataset):
     def num_classes(self) -> int:
         return len(self.categories) + 1 # +1 for background
     
-    # @property
-    # def image_sizes(self) -> list[tuple[int, tuple[int, int]]]:
-    #     return self.imgSizes
-        
-    
     def __getitem__(self, idx):
         # load images and masks
         img_path = self.root / self.imgs[idx]['file_name']
@@ -77,17 +72,18 @@ class MarineDataset(torch.utils.data.Dataset):
         iscrowd = []
         area = 0
         for i in range(num_objs):
-            boxes.append(self.annotations_dict[img_id][i]['bbox'])
+            boxes.append(xywh2xyxy(self.annotations_dict[img_id][i]['bbox']))   # convert the coordinates to xyxy
             labels.append(self.annotations_dict[img_id][i]['category_id'])
             iscrowd.append(self.annotations_dict[img_id][i]['iscrowd'])
             area = self.annotations_dict[img_id][i]['area']
 
         # convert everything into a torch.Tensor
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        boxes = resize_bbox(boxes, self.imgs[idx]['width'], self.imgs[idx]['height'])
+        # boxes = resize_bbox(boxes, self.imgs[idx]['width'], self.imgs[idx]['height'])
         labels = torch.as_tensor(labels, dtype=torch.int64)
         iscrowd = torch.as_tensor(iscrowd, dtype=torch.int64)
         image_id = torch.tensor([img_id])
+        area = torch.as_tensor(area, dtype=torch.float32)
 
         target = dict()
         target["boxes"] = boxes

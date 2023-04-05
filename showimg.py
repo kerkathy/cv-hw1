@@ -10,9 +10,6 @@ img = cv2.imread(str(img_path))
 # print("value of img[0]: ", img)
 print("img_id: ", img_id)
 # print("size of img[0]: ", img.size())
-# img = img.permute(1, 2, 0).numpy()
-# img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-
 # bbox = [
 #         [
 #                 91,

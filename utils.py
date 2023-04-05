@@ -1,10 +1,20 @@
 import torch
 from torchvision import transforms
 
+# Convert bounding box coordinates from (x, y, w, h) to (xmin, ymin, xmax, ymax)
+def xywh2xyxy(x: list[int]) -> list[int]:
+    y = list()
+    y.append(x[0] - x[2] / 2)
+    y.append(x[1] - x[3] / 2)
+    y.append(x[0] + x[2] / 2)
+    y.append(x[1] + x[3] / 2)
+    return y
+
 def transform(img):
     """
     Resize image. Temporarily set dim to 576*576.
     No need to do normalization because detection model already does it.
+    TODO: do we need resize?
     """
     transform = transforms.Compose([
         # transforms.Resize((576, 576)),
