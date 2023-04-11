@@ -1,2 +1,6 @@
 # all model checkpoints
 *.pt
+
+# all images
+*.jpg
+*.png
