@@ -1,8 +1,9 @@
 import torch
 from PIL import Image
 import json
-from utils import resize_bbox, transform, xywh2xyxy
+from myutils import resize_bbox, transform, xywh2xyxy
 import cv2
+from collections import defaultdict
 
 class MarineDataset(torch.utils.data.Dataset):
     def __init__(self, path):
@@ -21,15 +22,18 @@ class MarineDataset(torch.utils.data.Dataset):
         # Group the annotations by their image_id
         # i.e. convert to a dictionary, where (key, value) = (image_id, list of annotations)
         # Also modify the category_id by adding 1
-        self.annotations_dict = {}
-        for i in range(len(data['annotations'])):
-            data['annotations'][i]['category_id'] += 1
-            image_id = data['annotations'][i]['image_id']
+        self.annotations_dict = defaultdict(list)
+        # self.annotations_dict = {}
+        for annotation in data['annotations']:
+            annotation['category_id'] += 1
+            image_id = annotation['image_id']
             if image_id in self.annotations_dict:
-                self.annotations_dict[image_id].append(data['annotations'][i])
+                self.annotations_dict[image_id].append(annotation)
             else:
-                self.annotations_dict[image_id] = [data['annotations'][i]]
-        
+                self.annotations_dict[image_id] = [annotation]
+
+        # Delete those images that have no annotations
+        self.imgs = [img for img in self.imgs if img['id'] in self.annotations_dict]
 
         # Draw image from tensor of size (3, 1024, 768) and save it to disk
         # DEBUGGNG
@@ -49,8 +53,6 @@ class MarineDataset(torch.utils.data.Dataset):
         # cv2.imwrite(f"debug-{img_name}.jpg", img)
         # # DEBUGGNG
         
-
-
         # TODO: transform data for data aug if needed
 
     @property
@@ -58,12 +60,12 @@ class MarineDataset(torch.utils.data.Dataset):
     def num_classes(self) -> int:
         return len(self.categories) + 1 # +1 for background
     
-    def __getitem__(self, idx):
+    def __getitem__(self, i):
         # load images and masks
-        img_path = self.root / self.imgs[idx]['file_name']
+        img_path = self.root / self.imgs[i]['file_name']
+        img_id = self.imgs[i]['id']
         img = Image.open(img_path).convert("RGB")
         img = transform(img)
-        img_id = self.imgs[idx]['id']
 
         # get bounding box coordinates for each mask
         num_objs = len(self.annotations_dict[img_id])
