@@ -12,3 +12,7 @@ mkdir ../hw1_datasets/labels
 
 # create yolo txts from coco json
 python create_yolo_labels.py
+
+# training
+python train.py --img-size 640 --batch 16 --epochs 60 --data marine.yaml --weights yolov5s.pt
+
