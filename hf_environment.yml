@@ -1,0 +1,15 @@
+name: hf 
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - transformers
+  - torchvision
+  - scipy
+  - pip:
+      - pip-tools
+      - torch
+      - timm
+      - pycocotools
+

@@ -1,6 +1,14 @@
 # all model checkpoints
 *.pt
+*.bin
+*.zip
+*checkpoint*
 
 # all images
 *.jpg
 *.png
+hw1_dataset/
+detr-object-detection-finetuned
+
+# cache
+__pycache__
