@@ -1,0 +1,16 @@
+name: old_hf 
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+      - pip-tools
+      - torch
+      - transformers
+      - scipy
+      - torchvision
+      - timm
+      - pycocotools
+      - coco-eval
+

@@ -86,7 +86,6 @@ for idx, batch in enumerate(tqdm(val_dataloader)):
     predictions = {target['image_id'].item(): output for target, output in zip(labels, results)}
     evaluator.update(predictions)
 
-print("[debugging]")
 evaluator.synchronize_between_processes()
 evaluator.accumulate()
 evaluator.summarize()
