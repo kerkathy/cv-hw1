@@ -2,12 +2,14 @@ from transformers import DetrFeatureExtractor, TrainingArguments, Trainer, DetrF
 from dataset import CocoDetection
 from torch.utils.data import DataLoader
 from pathlib import Path
-# from model import Detr
+from tqdm import tqdm
+import torch
 
 
 data_path = Path('hw1_dataset/images')
-model_checkpoint = "facebook/detr-resnet-50"
-# feature_extractor = DetrFeatureExtractor.from_pretrained(model_checkpoint)
+model_checkpoint = "facebook/detr-resnet-101"
+output_dir = "detr-resnet-101"
+
 processor = DetrFeatureExtractor.from_pretrained(model_checkpoint)
 
 train_dataset = CocoDetection(img_folder=data_path / 'train', processor=processor)
@@ -36,18 +38,18 @@ model = DetrForObjectDetection.from_pretrained(
 )
 
 training_args = TrainingArguments(
-    output_dir="detr-object-detection-finetuned",
+    output_dir=output_dir,
     remove_unused_columns=False,
     evaluation_strategy = "epoch",
     save_strategy = "epoch",
     learning_rate=5e-5,
     per_device_train_batch_size=2,
     per_device_eval_batch_size=2,
-    num_train_epochs=10,
-    logging_steps=50,
-    save_steps=200,
+    num_train_epochs=100,
+    logging_steps=200,
+    save_steps=400,
     load_best_model_at_end=True,
-    save_total_limit=2,
+    save_total_limit=3,
 )
 
 # Initalize our trainer
@@ -73,5 +75,4 @@ metrics["train_samples"] = min(max_train_samples, len(train_dataset))
 trainer.log_metrics("train", metrics)
 trainer.save_metrics("train", metrics)
 trainer.save_state()     
-
 
