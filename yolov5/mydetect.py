@@ -1,36 +1,44 @@
 import torch
 import os
 import json
+import sys
+
+if(len(sys.argv) < 2):
+    raise ValueError("Specify the data location and output path. Should be `mydetect.py <path_to_data> <path_to_output>` ")
+folder = sys.argv[1]  # or file, Path, URL, PIL, OpenCV, numpy, list
+output_path = sys.argv[2]
 
 # Model
-model_path = "runs/train/exp7/weights/best.pt"
-model = torch.hub.load('ultralytics/yolov5', 'custom', model_path)  # custom model
+model_path = "./runs/train/exp8/weights/best.pt"
+sys.path.insert(0, './runs')
+# model = torch.hub.load('ultralytics/yolov5', 'custom', model_path)  # custom model
+model = torch.hub.load('.', 'custom', model_path, source='local')  # custom model
 
 # Images
-folder = "../hw1_dataset/images/valid"  # or file, Path, URL, PIL, OpenCV, numpy, list
 img_names = [name for name in os.listdir(folder) if name.endswith(".jpg")]
 im = [os.path.join(folder, img) for img in img_names]
-print(f"{len(im)} test images in total.")
+print(f"{len(im)} test images in {folder}.\n")
 if len(im) == 0:
     print(os.listdir(folder))
-    raise NotImplementedError
+    raise ValueError(f"No image to detect in {sys.argv[1]}")
 
 # Inference
 results = model(im)
 # Results
 
 # results.xyxy[0]  # im predictions (tensor)
-with open("eval_output.json", 'w') as f:
+with open(output_path, 'w') as f:
     all_results = {}	
     for img, result in zip(img_names, results.pandas().xyxy):
-        result["boxes"] = result[["xmin", "ymin", "xmax", "ymax"]].apply(lambda x: ', '.join(x.astype(str)), axis=1)
-        out_dict = {}
-        out_dict["boxes"] = result["boxes"].tolist()
-        out_dict["scores"] = result["confidence"].tolist()
-        out_dict["labels"] = result["class"].tolist()
-        all_results[img] = out_dict
+    	result["boxes"] = result[["xmin", "ymin", "xmax", "ymax"]].values.tolist()
+    	out_dict = {}
+    	out_dict["boxes"] = result["boxes"].tolist()
+    	out_dict["scores"] = result["confidence"].tolist()
+    	out_dict["labels"] = result["class"].tolist()
+    	all_results[img] = out_dict
     json.dump(all_results, f)  
-    
+print(f"Results saved to {output_path}")
+
 # im predictions (pandas)
 #      xmin    ymin    xmax   ymax  confidence  class    name
 # 0  749.50   43.50  1148.0  704.5    0.874023      0  person
