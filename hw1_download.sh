@@ -1,7 +1,7 @@
 # create env
-conda env create -f environment.yml
-conda activate yolo
-pip install -r requirements.txt  # install
+# conda env create -f environment.yml
+# conda activate yolo
+# pip install -r requirements.txt  # install
 
 # clone repo and install
 # git clone https://github.com/ultralytics/yolov5  # clone
@@ -20,6 +20,6 @@ cd yolov5
 
 # TODO model weight link
 wget https://www.dropbox.com/s/upkacxo9ejia5kz/model.zip
-unzip cv_hw1.zip
+unzip model.zip
 
 cd ..

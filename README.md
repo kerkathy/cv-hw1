@@ -1,7 +1,57 @@
 # Object Detection Using CNN-based Network
 
-## Data
-The directory structure should look like the below:
+## YOLO
+### Before you start
+We should already have `yolov5` folder in our repo. But in case you don't have one, clone it from official repo.
+```
+# run this only if you didn't see `yolov5` folder in current directory
+git clone https://github.com/ultralytics/yolov5
+```
+
+### Environment
+First, change working directory to `yolov5`. Then do the below.
+```
+conda env create -f environment.yml
+conda actiavte yolo
+pip install -r requirements.txt
+```
+### Preprocess
+Create required file structure for yolo. Then, create yolo txts from coco json files.
+```
+mkdir ../hw1_datasets/labels
+python ../create_yolo_labels.py
+```
+
+### Train
+train the model from pretrained yolov5 large weights.
+```
+python train.py --img-size 640 --batch 16 --epochs 200 --data marine.yaml --weights yolov5l.pt
+
+```
+
+### Inference
+Provide 
+- {1}: the path to test img folder
+- {2}: path to output file
+To get the Map numbers, run the below:
+```
+python mydetect.py ${1} ${2}
+# for example
+# python mydetect.py images/valid output.json
+
+```
+To draw bbox on each image, run the below:
+```
+# some other options are provided, go to official repo to see.
+python detect.py --weights "<path_to_weight.pt>" --source "images/test/*" --save-txt
+# for example,
+# python detect.py --weights "runs/train/exp/weights/best.pt" --source "images/test/*" --save-txt
+
+```
+
+
+### Data
+When training YOLO, make sure the directory structure looks like the below:
 ```
 .
 ├── train

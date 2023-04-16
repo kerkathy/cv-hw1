@@ -17,10 +17,10 @@ print(f"Inference using {model_path}")
 # Images
 img_names = [name for name in os.listdir(folder) if name.endswith(".jpg")]
 im = [os.path.join(folder, img) for img in img_names]
-print(f"{len(im)} test images in {folder}.\n")
+print(f"{len(im)} test images in {os.path.abspath(folder)}.\n")
 if len(im) == 0:
     print(os.listdir(folder))
-    raise ValueError(f"No image to detect in {sys.argv[1]}")
+    raise ValueError(f"No image to detect in {os.path.abspath(folder)}")
 
 # Inference
 results = model(im)
@@ -37,7 +37,7 @@ with open(output_path, 'w') as f:
     	out_dict["labels"] = result["class"].tolist()
     	all_results[img] = out_dict
     json.dump(all_results, f)  
-print(f"Results saved to {output_path}")
+print(f"Results saved to {os.path.abspath(output_path)}")
 
 # im predictions (pandas)
 #      xmin    ymin    xmax   ymax  confidence  class    name
