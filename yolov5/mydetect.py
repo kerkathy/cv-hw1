@@ -9,11 +9,11 @@ folder = sys.argv[1]  # or file, Path, URL, PIL, OpenCV, numpy, list
 output_path = sys.argv[2]
 
 # Model
-model_path = "./runs/train/exp8/weights/best.pt"
-sys.path.insert(0, './runs')
+model_path = "best.pt"
+# sys.path.insert(0, './runs')
 # model = torch.hub.load('ultralytics/yolov5', 'custom', model_path)  # custom model
 model = torch.hub.load('.', 'custom', model_path, source='local')  # custom model
-
+print(f"Inference using {model_path}")
 # Images
 img_names = [name for name in os.listdir(folder) if name.endswith(".jpg")]
 im = [os.path.join(folder, img) for img in img_names]

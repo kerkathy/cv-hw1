@@ -45,5 +45,5 @@ setuptools>=65.5.1 # Snyk vulnerability fix
 # ipython  # interactive notebook
 # mss  # screenshots
 # albumentations>=1.0.3
-# pycocotools>=2.0.6  # COCO mAP
+pycocotools>=2.0.6  # COCO mAP
 # ultralytics  # HUB https://hub.ultralytics.com
