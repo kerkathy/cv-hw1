@@ -52,6 +52,7 @@ python detect.py --weights "<path_to_weight.pt>" --source "images/test/*" --save
 
 ### Data Structure for YOLO
 When training YOLO, make sure the dataset folder contains
+```
 - images
 --- train
 --- valid
@@ -59,6 +60,7 @@ When training YOLO, make sure the dataset folder contains
 - labels
 --- train
 --- valid
+```
 Also, state this directory path as required in your mydataset.yaml (in this repo, it's called marine.yaml)
 
 ### Original Data 
