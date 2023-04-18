@@ -11,8 +11,6 @@ image = Image.open('hw1_dataset/images/test/IMG_2574_jpeg_jpg.rf.ca0c3ad32384309
 model = DetrForObjectDetection.from_pretrained(model_path)
 processor = DetrImageProcessor.from_pretrained(model_path)
 encoding = processor(image, return_tensors="pt")
-# print("encoding")
-# print(encoding)
 
 # Visualize the result
 with torch.no_grad():
@@ -23,7 +21,6 @@ width, height = image.size
 postprocessed_outputs = processor.post_process_object_detection(outputs, target_sizes=[(height, width)], threshold=0.5)
 
 results = postprocessed_outputs[0]
-# print(results)
 
 # colors for visualization
 COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],

@@ -33,7 +33,7 @@ python train.py --img-size 640 --batch 16 --epochs 200 --data marine.yaml --weig
 Provide 
 - {1}: the path to test img folder
 - {2}: path to output file
-To get the Map numbers, run the below:
+To get the predicted json file, ...  results, run the below (the file should be found under `yolov5` folder):
 ```
 python mydetect.py ${1} ${2}
 # for example
@@ -48,7 +48,11 @@ python detect.py --weights "<path_to_weight.pt>" --source "images/test/*" --save
 # python detect.py --weights "runs/train/exp/weights/best.pt" --source "images/test/*" --save-txt
 
 ```
-
+To see metrics (MAP@50, ...) provided by TAs, run the below code under `hw1_dataset` folder
+```
+python check_your_prediction_valid.py <path/to/pred.json> <path/to/groundtruth.json>
+```
+It should print all AP scores and Avg recall on terminal.
 
 ### Data Structure for YOLO
 When training YOLO, make sure the dataset folder contains
@@ -63,7 +67,41 @@ When training YOLO, make sure the dataset folder contains
 ```
 Also, state this directory path as required in your mydataset.yaml (in this repo, it's called marine.yaml)
 
-### Original Data 
+## DETR
+### Train
+Under `cv-hw1` directory you should see a file `train_detr.py`. This is for DETR training.
+```
+python train_detr.py
+```
+
+### Inference
+If you haven't had `detr` folder in current working dir, clone from official repo. We need `CocoEvaluator` inside to evaluate.
+```
+git clone https://github.com/facebookresearch/detr.git
+```
+Then I wrote a `eval_detr.py` and put it inside `detr` folder to run the evaluation.
+Then, we can run the evaluation. This should print all results on terminal, incuding MAPs and recalls.
+Modify the variable `model_checkpoint` in the code to see results of different models.
+```
+cd detr
+python eval_detr.py
+```
+
+For the inference on a single image, go back to `cv-hw1` directory and run the `inference_detr.py` file. A `test_img.png` would be generated at current working directory.
+```
+cd ..
+python inference_detr.py
+```
+
+# Suppose current working directory is cv-hw1
+```
+cd detr
+python eval_detr.py
+```
+It should print all AP scores and Avg recall on terminal.
+
+
+## Original Data 
 The provided directory structure looks like the below:
 ```
 .

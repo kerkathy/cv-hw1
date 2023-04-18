@@ -8,9 +8,8 @@ import os
 import sys
 from datasets.coco_eval import CocoEvaluator 
 
-model_checkpoint = "../detr-object-detection-finetuned"
+model_checkpoint = "../detr-resnet-101/checkpoint-12320"
 data_path = Path('../hw1_dataset/images')
-
 processor = DetrImageProcessor.from_pretrained(model_checkpoint)
 
 val_dataset = CocoDetection(img_folder=data_path / 'valid', processor=processor, train=False)
@@ -18,7 +17,6 @@ val_dataloader = DataLoader(val_dataset, collate_fn=val_dataset.collate_fn, batc
 
 id2label = {x["id"]: x["name"] for x in val_dataset.categories}
 label2id = {v: k for k, v in id2label.items()}
-print(f"id2label: {id2label}")
 
 model = DetrForObjectDetection.from_pretrained(
     model_checkpoint,
@@ -86,6 +84,7 @@ for idx, batch in enumerate(tqdm(val_dataloader)):
     predictions = {target['image_id'].item(): output for target, output in zip(labels, results)}
     evaluator.update(predictions)
 
+print(f"Results of model {os.path.abspath(model_checkpoint)}")
 evaluator.synchronize_between_processes()
 evaluator.accumulate()
 evaluator.summarize()

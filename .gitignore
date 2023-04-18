@@ -9,6 +9,8 @@
 *.png
 hw1_dataset/
 detr-object-detection-finetuned
+best-detr-object-detection-finetuned
+detr-resnet-101
 
 # cache
 __pycache__

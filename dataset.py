@@ -3,7 +3,6 @@ import os
 import json
 from pathlib import Path
 
-# TODO: modify json file name
 class CocoDetection(torchvision.datasets.CocoDetection):
     def __init__(self, img_folder, processor, train=True):
         ann_file = os.path.join(img_folder, "_annotations.coco.json")
