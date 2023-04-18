@@ -1,5 +1,5 @@
 # Object Detection Using CNN-based Network
-[ToC]
+[TOC]
 
 ## YOLO
 ### Before you start
